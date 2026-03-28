@@ -5,13 +5,16 @@ describe('Deterministic Verification Layer - Zod Schema', () => {
     const validJson = {
       emergencyType: "Chemical Spill",
       riskLevel: "High",
+      conditionSeverity: 4,
       summary: "A green gas leak is affecting the factory floor.",
       actions: [
         "Evacuate the immediate area upwind", 
         "Cover mouth and nose with a damp cloth", 
         "Do not turn on electrical switches"
       ],
-      recommendedContacts: ["Hazmat Unit", "Ambulance"]
+      firstAidInstructions: ["Flush eyes if exposed", "Deep breaths in fresh air"],
+      recommendedContacts: ["Hazmat Unit", "Ambulance"],
+      nearbyHospitalSearchTerms: ["Toxicology Center", "ER"]
     };
 
     const result = EmergencyResponseSchema.safeParse(validJson);

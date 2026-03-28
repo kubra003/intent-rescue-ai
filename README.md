@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IntentRescue AI: Smart Emergency Triage & Coordination
 
-## Getting Started
+**Ranking Up Submission &bull; PromptWars Hackathon &bull; Google Antigravity**
 
-First, run the development server:
+IntentRescue AI is a high-stakes emergency orchestration assistant built to demonstrate the power of **Google Gemini 1.5 Pro** and integrated **Google Services**. It transforms unstructured, multimodal emergency signals (Voice, Text, Images) into deterministic clinical protocols and real-world coordination actions.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🏥 Vertical: Healthcare & Emergency Response
+Our solution targets the critical 'Golden Hour' in emergency medicine where rapid, accurate triage and coordination save lives.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🧠 Approach and Logic
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Multimodal Intake (The 'Smart Assistant')
+- **Voice-to-Intent**: Uses browser SpeechRecognition for immediate hands-free dictation in stressful environments.
+- **Multimodal Perception**: Gemini 1.5 Pro analyzes both text descriptions and casualty images simultaneously to detect trauma types and severity.
+- **PII Sanitization**: A custom regex-based sanitization layer ensures phone numbers, emails, and SSNs are redacted before hitting the LLM, aligning with HIPAA-inspired safety standards.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Clinical Reasoning Engine
+- **Deterministic Triage**: We use **Zod-backed schema validation** on Gemini's JSON output. This ensures that the AI never 'hallucinates' the structure of a protocol. If validation fails, it triggers a 'Clinical Edge' fallback.
+- **ABC Protocol**: The system prompt enforces adherence to universal medical standards (Airway, Breathing, Circulation) for all instructions.
 
-## Learn More
+### 3. Google Services Orchestration
+- **Google Maps Interaction**: Automatically generates trauma-specific search terms (e.g., 'Trauma Center' for fractures) to find the nearest specialized hospital.
+- **Google Calendar Integration**: Simulates immediate slot reservation for clinical callbacks, allowing victims or responders to book a telehealth bridge or ER notification.
+- **Google Cloud Storage (Architecture)**: Designed to store intake logs and images with safe lifecycle policies for medical audit trails.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ How it Works
+1.  **Intake**: User speaks or uploads a photo of an injury.
+2.  **Analysis**: The `api/analyze` route calls Gemini 1.5 Pro with a high-stakes clinical system prompt.
+3.  **Synthesis**: The engine returns a Triage Level (1-5), First Aid directions, and Hospital search terms.
+4.  **Action**: 
+    -   The UI renders a **Google Map** showing nearby medical facilities.
+    -   The **Calendar Booking** component allows immediate coordination with on-call specialists.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚖️ Assumptions & Security
+- **Simulator Mode**: This application is a clinical simulator and includes a mandatory medical disclaimer.
+- **Deterministic Guardrails**: We assume that in high-stakes environments, a 'safe fallback' is better than an 'AI guess'. We use a 3-layer validation (Schema -> PII -> Fallback).
+- **API Availability**: Assumes valid Google Cloud project credentials for Maps, Calendar, and Generative AI.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Future Roadmap
+- **Real-time Vitals**: Integrating with Wearables API.
+- **Ambulance Telemetry**: Real-time traffic-aware routing using Google Maps Routes API.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+**Built with Google Antigravity | Intent-Driven Development**

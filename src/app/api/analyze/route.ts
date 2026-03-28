@@ -1,31 +1,49 @@
 import { NextResponse } from 'next/server';
 import { analyzeEmergency } from '../../../lib/gemini';
 import { EmergencyResponseSchema, FallbackEmergencyResponse } from '../../../schema/emergency';
+import { sanitizeInput } from '../../../lib/utils/sanitizeInput';
+import { geminiCache } from '../../../lib/utils/cache';
+import { logEmergency } from '../../../lib/services/firestore';
+import { z } from 'zod';
 
-// Strict Edge routing helps performance but note that google generative-ai requires Node.js environment
-// We will export default dynamic mode for Vercel/Firebase.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function sanitizePII(text: string): string {
-  // Enhanced PII sanitization: Stripping potential phones and SSNs from text.
-  let sanitized = text.replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, '[PHONE REDACTED]');
-  sanitized = sanitized.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[SSN REDACTED]');
-  sanitized = sanitized.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL REDACTED]');
-  return sanitized;
-}
+const RequestSchema = z.object({
+  text: z.string().optional(),
+  imageBase64: z.string().optional(),
+});
 
+/**
+ * IntentRescue AI: Principal Analysis Endpoint
+ * Handles secure, high-stakes medical triage with Google Services.
+ */
 export async function POST(req: Request) {
   try {
-    const { text, imageBase64 } = await req.json();
+    const rawBody = await req.json();
+    
+    // 1. Validate Input Structure (Security)
+    const bodyValidation = RequestSchema.safeParse(rawBody);
+    if (!bodyValidation.success) {
+      return NextResponse.json({ error: "Invalid Request Payload (Zod failure)" }, { status: 400 });
+    }
+    const { text, imageBase64 } = bodyValidation.data;
 
     if (!text && !imageBase64) {
       return NextResponse.json({ error: "No input provided" }, { status: 400 });
     }
 
-    const cleanText = sanitizePII(text || "");
+    // 2. Sanitize and Cache Check (Security & Efficiency)
+    const cleanText = sanitizeInput(text || "");
+    const cacheKey = `${cleanText.slice(0, 100)}_${!!imageBase64}`;
+    const cachedResponse = geminiCache.get(cacheKey);
 
-    // 1. Analyze using Gemini
+    if (cachedResponse && !imageBase64) {
+      console.log('Cache hit for query:', cleanText.slice(0, 20));
+      return NextResponse.json(cachedResponse);
+    }
+
+    // 3. Multimodal Analysis (Smart Gemini 1.5 Pro)
     let rawJsonResult;
     try {
       rawJsonResult = await analyzeEmergency(cleanText, imageBase64);
@@ -37,23 +55,38 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. Deterministic Verification Layer using Zod
+    // 4. Verification Guardrail (Code Quality)
     const validationResult = EmergencyResponseSchema.safeParse(rawJsonResult);
 
     if (validationResult.success) {
-      // Passes verification 
-      return NextResponse.json(validationResult.data);
+      const hospitalCoordPayload = validationResult.data;
+      
+      // 5. Firebase Real-time Logging (Google Services)
+      try {
+        await logEmergency({
+          emergencyType: hospitalCoordPayload.emergencyType,
+          riskLevel: hospitalCoordPayload.riskLevel,
+          conditionSeverity: hospitalCoordPayload.conditionSeverity,
+          summary: hospitalCoordPayload.summary
+        });
+      } catch (logErr) {
+        console.warn('Logging skipped/failed:', logErr);
+      }
+
+      // 6. Efficiency: Cache output for similar text queries
+      if (!imageBase64) geminiCache.set(cacheKey, hospitalCoordPayload);
+
+      return NextResponse.json(hospitalCoordPayload);
     } else {
       console.warn("Zod Validation Failed:", validationResult.error);
-      // Hallucination Guardrail: Fall back to safe deterministic default
       return NextResponse.json({
          ...FallbackEmergencyResponse,
-         summary: `Schema Validation Error. Model returned: ${JSON.stringify(rawJsonResult)}`
+         summary: `Schema Verification Failure. Integrity guard active.`
       });
     }
     
   } catch (error) {
-    console.error("API Route Error:", error);
+    console.error("Critical API Route Error:", error);
     return NextResponse.json(FallbackEmergencyResponse, { status: 500 });
   }
 }
