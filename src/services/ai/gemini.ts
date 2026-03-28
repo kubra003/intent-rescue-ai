@@ -14,7 +14,7 @@ const vertexAI = new VertexAI({ project: project, location: location });
 
 // Instantiate the model
 const generativeModel = vertexAI.getGenerativeModel({
-  model: 'gemini-1.5-pro',
+  model: 'gemini-1.5-flash',
 });
 
 export async function analyzeEmergency(text: string, imageBase64?: string) {
