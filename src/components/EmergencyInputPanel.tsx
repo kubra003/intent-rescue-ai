@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, Mic, Megaphone, AlertTriangle, X } from 'lucide-react';
+import { Camera, Mic, Megaphone, AlertTriangle, X, Activity } from 'lucide-react';
 import { useEmergencyStore } from '../store/useEmergencyStore';
 
 export function EmergencyInputPanel() {
@@ -24,7 +24,7 @@ export function EmergencyInputPanel() {
           }
         }
         if (currentTranscript) {
-          setInputText((prev) => prev ? prev + " " + currentTranscript : currentTranscript);
+           setInputText((prev) => prev ? prev + " " + currentTranscript : currentTranscript);
         }
       };
       setRecognition(rec);
@@ -57,19 +57,22 @@ export function EmergencyInputPanel() {
   };
 
   return (
-    <section className="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-2xl border-[6px] border-black" aria-label="Emergency Input Form">
-      <h2 className="text-3xl md:text-4xl font-black mb-6 flex items-center gap-3 text-red-700 uppercase tracking-widest leading-none">
-        <AlertTriangle size={42} aria-hidden="true" strokeWidth={3} />
-        Emergency Intake
+    <section className="bg-white/[0.03] backdrop-blur-[60px] p-8 md:p-12 rounded-[3.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)] w-full max-w-2xl border border-white/10" aria-label="Emergency Input Form">
+      <h2 className="text-3xl md:text-5xl font-black mb-10 flex items-center gap-5 text-white uppercase tracking-widest leading-none drop-shadow-lg">
+        <div className="bg-red-500/10 p-5 rounded-[1.5rem] border border-red-500/20 shadow-[0_0_40px_rgba(220,38,38,0.2)]">
+           <AlertTriangle size={42} className="text-red-500" strokeWidth={2.5} />
+        </div>
+        Intake Core
       </h2>
 
-      <div className="space-y-6">
-        <div className="relative">
+      <div className="space-y-8">
+        <div className="relative group">
           <label htmlFor="emergency-text" className="sr-only">Type or describe the emergency here</label>
+          <div className="absolute -inset-1 bg-gradient-to-r from-red-600/50 to-orange-600/50 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-300 pointer-events-none" />
           <textarea
             id="emergency-text"
-            className="w-full h-40 p-5 text-xl md:text-2xl border-[4px] border-black rounded-xl focus:border-red-600 focus:ring-4 focus:ring-red-200 transition-all font-bold text-gray-900 resize-none shadow-inner"
-            placeholder="What is happening? (e.g., Car crash, poison, chemical leak...)"
+            className="relative w-full h-56 p-8 text-xl md:text-3xl bg-black/40 backdrop-blur-2xl rounded-3xl focus:border-red-500/50 border border-white-[0.05] focus:ring-4 focus:ring-red-500/20 outline-none transition-all font-medium text-gray-100 resize-none shadow-inner placeholder-gray-700 block"
+            placeholder="Type or speak details... (e.g. Unconscious victim)"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={status === 'analyzing'}
@@ -77,28 +80,28 @@ export function EmergencyInputPanel() {
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-5 pt-2">
           <button 
             type="button"
             onClick={toggleRecording}
-            className={`flex-1 flex justify-center items-center gap-3 py-5 rounded-2xl font-bold text-xl md:text-2xl border-b-[6px] active:border-b-0 active:translate-y-2 transition-all ${
-              isRecording ? 'bg-red-600 text-white border-red-900 animate-pulse' : 'bg-gray-200 text-black border-gray-400 hover:bg-gray-300'
+            className={`flex-1 flex justify-center items-center gap-4 py-6 rounded-[2rem] font-bold text-xl md:text-2xl transition-all duration-300 transform active:scale-[0.98] border border-white/10 ${
+              isRecording 
+                ? 'bg-red-500/20 text-red-400 shadow-[0_0_40px_rgba(220,38,38,0.3)] animate-pulse border-red-500/50' 
+                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:shadow-2xl'
             }`}
             aria-pressed={isRecording}
-            aria-label={isRecording ? "Stop voice recording" : "Start voice recording"}
           >
             <Mic size={32} strokeWidth={2.5} />
-            {isRecording ? "Listening..." : "Voice"}
+            {isRecording ? "Listening..." : "Dictate"}
           </button>
 
           <button 
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex-1 flex justify-center items-center gap-3 py-5 bg-black text-white rounded-2xl font-bold text-xl md:text-2xl border-b-[6px] border-gray-800 hover:bg-gray-900 active:border-b-0 active:translate-y-2 transition-all"
-            aria-label="Upload photo of emergency"
+            className="flex-1 flex justify-center items-center gap-4 py-6 bg-white/5 text-gray-400 hover:text-white rounded-[2rem] font-bold text-xl md:text-2xl border border-white/10 hover:bg-white/10 hover:shadow-2xl transition-all duration-300 transform active:scale-[0.98]"
           >
             <Camera size={32} strokeWidth={2.5} />
-            Upload Photo
+            Upload
           </button>
           
           <input 
@@ -107,19 +110,17 @@ export function EmergencyInputPanel() {
             onChange={handleImageUpload} 
             accept="image/*" 
             className="hidden" 
-            aria-hidden="true" 
           />
         </div>
 
         {imagePreview && (
-          <div className="relative mt-4 border-4 border-black rounded-xl overflow-hidden shadow-sm w-full">
-            <img src={imagePreview} alt="Uploaded emergency" className="w-full h-64 object-cover" />
+          <div className="relative mt-6 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl w-full p-2 bg-black/50 backdrop-blur-xl animate-in fade-in zoom-in duration-500">
+            <img src={imagePreview} alt="Uploaded" className="w-full h-80 object-cover rounded-[2rem] opacity-75 mix-blend-lighten" />
             <button 
               onClick={() => setImagePreview(null)} 
-              className="absolute top-3 right-3 bg-red-600 text-white p-2 font-bold rounded-full shadow-lg border-2 border-white hover:bg-red-700" 
-              aria-label="Remove image"
+              className="absolute top-6 right-6 bg-black/80 backdrop-blur-md text-gray-300 hover:text-white p-4 font-bold rounded-full shadow-2xl border border-white/10 hover:border-red-500 hover:bg-red-900/50 hover:scale-110 transition-all duration-300"
             >
-              <X size={24} strokeWidth={3} />
+              <X size={28} strokeWidth={3} />
             </button>
           </div>
         )}
@@ -127,17 +128,20 @@ export function EmergencyInputPanel() {
         <button 
           onClick={handleSubmit} 
           disabled={status === 'analyzing' || (!inputText && !imagePreview)}
-          className="w-full flex justify-center items-center gap-3 py-6 mt-4 bg-red-700 text-white rounded-2xl font-black text-3xl border-b-[8px] border-red-900 hover:bg-red-600 active:border-b-0 active:translate-y-[8px] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider shadow-xl"
-          aria-live="polite"
+          className="w-full relative group flex justify-center items-center gap-4 py-8 mt-10 rounded-[2.5rem] font-black text-3xl md:text-4xl transition-all duration-500 disabled:opacity-20 disabled:cursor-not-allowed uppercase tracking-[0.2em] overflow-hidden"
         >
-          {status === 'analyzing' ? (
-             <span className="animate-pulse">Analyzing...</span>
-          ) : (
-            <>
-              <Megaphone size={40} className="animate-bounce" />
-              Get Action Plan
-            </>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-red-700 via-red-600 to-orange-700 transition-transform duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/10 transition-opacity duration-300 mix-blend-overlay pointer-events-none" />
+          <span className="relative z-10 flex items-center gap-4 text-white drop-shadow-xl font-black">
+            {status === 'analyzing' ? (
+               <span className="animate-pulse flex items-center gap-4 opacity-80"><Activity size={40} className="animate-spin text-white" /> Synthesizing...</span>
+            ) : (
+              <>
+                <Megaphone size={40} strokeWidth={2.5} className="group-hover:-rotate-12 transition-transform duration-500 drop-shadow-md" />
+                Analyze Scope
+              </>
+            )}
+          </span>
         </button>
       </div>
     </section>

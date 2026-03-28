@@ -10,12 +10,12 @@ export function ResultsPanel() {
   if (status !== 'success' && status !== 'error' || !result) {
     if (status === 'error') {
        return (
-         <div className="bg-red-900 text-white p-8 rounded-3xl w-full max-w-2xl text-center border-[6px] border-black" aria-live="assertive">
-           <AlertOctagon size={80} className="mx-auto mb-6 animate-pulse" />
-           <h2 className="text-4xl font-black uppercase tracking-widest mb-4">System Error</h2>
-           <p className="text-2xl font-bold mb-8">Unable to process the emergency. Seek immediate human assistance.</p>
-           <button onClick={reset} className="bg-white text-red-900 px-8 py-4 rounded-2xl font-black text-2xl uppercase border-b-[8px] border-gray-300 active:border-b-0 active:translate-y-[8px] hover:bg-gray-100 transition-all">
-             Try Again
+         <div className="bg-red-950/80 backdrop-blur-3xl text-white p-12 rounded-[3.5rem] w-full max-w-2xl text-center border border-red-500/30 shadow-[0_0_120px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-500">
+           <AlertOctagon size={120} className="mx-auto mb-8 text-red-500 animate-[pulse_2s_infinite]" strokeWidth={2} />
+           <h2 className="text-5xl font-black uppercase tracking-[0.3em] mb-6 text-red-100">AI Error</h2>
+           <p className="text-2xl font-medium mb-12 text-red-200">System could not safely categorize the emergency payload. Seek human dispatch immediately.</p>
+           <button onClick={reset} className="bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-black text-2xl uppercase tracking-widest border border-white/20 transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl">
+             Reset State
            </button>
          </div>
        );
@@ -25,60 +25,69 @@ export function ResultsPanel() {
 
   // Determine colors based on risk level
   const isCritical = result.riskLevel === 'Critical' || result.riskLevel === 'High';
-  const headerBg = isCritical ? 'bg-red-700' : 'bg-orange-600';
+  const headerGradient = isCritical ? 'from-red-900 to-black/80' : 'from-orange-900 to-black/80';
+  const riskColorBadge = isCritical ? 'border-red-500/50 text-red-300 bg-red-950/50 shadow-[0_0_30px_rgba(220,38,38,0.5)]' : 'border-orange-500/50 text-orange-300 bg-orange-950/50 shadow-[0_0_30px_rgba(249,115,22,0.5)]';
 
   return (
     <section 
-      className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl border-[6px] border-black overflow-hidden animate-in fade-in zoom-in duration-300" 
+      className="bg-black/50 backdrop-blur-[80px] rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)] w-full max-w-3xl border border-white/10 overflow-hidden animate-in fade-in slide-in-from-bottom-12 duration-700 ease-out" 
       aria-label="Emergency Response Protocols"
-      aria-live="assertive"
     >
-      <div className={`${headerBg} p-6 md:p-8 text-white border-b-[6px] border-black flex flex-col md:flex-row justify-between md:items-center gap-4`}>
-        <div>
-          <h2 className="text-4xl md:text-5xl font-black uppercase tracking-widest flex items-center gap-4 py-2 leading-none">
-            {isCritical ? <ShieldAlert size={48} className="animate-pulse flex-shrink-0" /> : <AlertOctagon size={48} className="flex-shrink-0" />}
-            {result.emergencyType}
+      <div className={`bg-gradient-to-r ${headerGradient} p-8 md:p-12 border-b border-white/10 flex flex-col md:flex-row justify-between md:items-start gap-8 relative overflow-hidden`}>
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="z-10 relative">
+          <h2 className="text-4xl md:text-6xl font-black uppercase tracking-widest flex items-center gap-6 text-white drop-shadow-2xl">
+            {isCritical ? <ShieldAlert size={64} className="animate-pulse text-red-500 flex-shrink-0" strokeWidth={2.5} /> : <AlertOctagon size={64} className="text-orange-400 flex-shrink-0" strokeWidth={2} />}
+            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 leading-tight">
+               {result.emergencyType}
+            </span>
           </h2>
-          <span className="inline-block mt-3 px-5 py-2 bg-black text-white font-black text-2xl rounded-full border-[3px] border-white uppercase shadow-md">
-            Risk: {result.riskLevel}
-          </span>
+          <div className="mt-8 flex">
+            <span className={`px-6 py-3 font-black text-xl md:text-2xl rounded-full border ${riskColorBadge} uppercase tracking-[0.2em]`}>
+              Risk &bull; {result.riskLevel}
+            </span>
+          </div>
         </div>
-        <button onClick={reset} aria-label="Reset and start over" className="bg-black/30 hover:bg-black/50 p-4 rounded-full transition-colors self-start md:self-center border-4 border-transparent hover:border-white focus:outline-none focus:ring-4 focus:ring-white">
-            <RotateCcw size={32} />
+        <button onClick={reset} aria-label="Reset" className="z-10 bg-white/5 hover:bg-white/15 p-5 rounded-full transition-all border border-white/5 hover:border-white/20 self-start hover:rotate-180 duration-500 shadow-2xl">
+            <RotateCcw size={32} className="text-gray-300" strokeWidth={2.5} />
         </button>
       </div>
 
-      <div className="p-6 md:p-8 bg-gray-50">
-        <p className="text-xl md:text-3xl font-bold text-gray-900 mb-10 border-l-[8px] border-black pl-5 leading-tight">
+      <div className="p-8 md:p-12 bg-white/[0.02] relative">
+        <p className="text-2xl md:text-4xl font-semibold text-gray-200 mb-14 border-l-4 border-red-500/50 pl-6 md:pl-8 leading-relaxed tracking-wide">
           {result.summary}
         </p>
 
-        <h3 className="text-3xl md:text-4xl font-black text-black mb-6 uppercase tracking-wider">Action Steps</h3>
-        <ul className="space-y-5 mb-10">
+        <h3 className="text-2xl md:text-3xl font-black text-gray-500 mb-8 uppercase tracking-[0.3em]">Protocol Outline</h3>
+        <ul className="space-y-6 mb-16 relative z-10">
+          <div className="absolute left-[1.65rem] top-8 bottom-8 w-1 bg-white/5 rounded-full -z-10 hidden md:block" />
           {result.actions.map((action, idx) => (
-            <li key={idx} className="flex gap-5 items-start bg-white p-5 rounded-3xl border-[4px] border-black shadow-md">
-              <span className="flex-shrink-0 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full font-black text-2xl shadow-inner">
+            <li key={idx} className="flex flex-col md:flex-row gap-5 md:gap-8 items-start group relative">
+              <span className="flex-shrink-0 bg-black/80 text-gray-200 border border-white/10 w-14 h-14 flex items-center justify-center rounded-2xl font-black text-2xl shadow-2xl group-hover:bg-red-900 group-hover:border-red-500/50 group-hover:text-white transition-all duration-300">
                 {idx + 1}
               </span>
-              <span className="text-2xl md:text-3xl font-bold leading-tight pt-1 text-gray-900">
-                {action}
-              </span>
+              <div className="bg-white/5 border border-white/5 p-6 md:p-8 rounded-[2rem] shadow-xl w-full group-hover:bg-white/10 group-hover:border-white/20 group-hover:shadow-[0_0_40px_rgba(255,255,255,0.05)] transition-all duration-500 backdrop-blur-md">
+                 <span className="text-xl md:text-3xl font-medium leading-snug text-gray-100 block tracking-wide">
+                   {action}
+                 </span>
+              </div>
             </li>
           ))}
         </ul>
 
-        <h3 className="text-3xl md:text-4xl font-black text-black mb-6 uppercase tracking-wider flex items-center gap-4">
-          <PhoneCall size={36} strokeWidth={3} /> Contacts
+        <h3 className="text-xl md:text-2xl font-black text-gray-500 mb-8 uppercase tracking-[0.3em] flex items-center gap-4">
+          <PhoneCall size={28} strokeWidth={2} /> Instant Dispatch
         </h3>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
           {result.recommendedContacts.map((contact, idx) => (
             <a 
               key={idx} 
               href={`tel:911`} 
-              className="flex justify-between items-center bg-blue-700 text-white p-6 rounded-2xl text-2xl md:text-4xl font-black border-[6px] border-black hover:bg-blue-600 active:translate-y-[8px] active:border-b-0 transition-transform uppercase shadow-[0_8px_0_0_#000] active:shadow-none"
+              className="group relative overflow-hidden flex justify-between items-center bg-blue-900/30 text-blue-100 p-8 md:p-10 rounded-[2.5rem] text-3xl md:text-5xl font-black border border-blue-500/20 hover:border-blue-400/60 transition-all duration-500 hover:shadow-[0_0_60px_rgba(59,130,246,0.2)] hover:scale-[1.02]"
             >
-              <span>{contact}</span>
-              <ArrowRight size={48} className="hidden sm:block" strokeWidth={3} />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              <span className="relative z-10 tracking-widest">{contact}</span>
+              <ArrowRight size={56} className="relative z-10 hidden sm:block opacity-30 group-hover:opacity-100 group-hover:translate-x-4 transition-all duration-500" strokeWidth={2} />
             </a>
           ))}
         </div>
