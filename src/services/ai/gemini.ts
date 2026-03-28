@@ -26,6 +26,7 @@ CRITICAL GUIDELINES:
 2. Assess "conditionSeverity" on a scale of 1 (Stable/Minimal) to 5 (Critical/Life-Threatening).
 3. "firstAidInstructions" should be immediate, safe actions for a layperson to perform before help arrives.
 4. "nearbyHospitalSearchTerms" should be specific to the trauma (e.g., if there's a burn, include 'Burn Center'; if it's a child, include 'Pediatric ER').
+5. Provide a "confidence" score (0.0 to 1.0) based on the clarity and evidence in the input.
 
 Your payload must exactly match this JSON structure:
 {
@@ -36,7 +37,8 @@ Your payload must exactly match this JSON structure:
   "actions": ["string"],
   "firstAidInstructions": ["string"],
   "recommendedContacts": ["string"],
-  "nearbyHospitalSearchTerms": ["string"]
+  "nearbyHospitalSearchTerms": ["string"],
+  "confidence": number
 }`;
 
   const prompt = `Emergency Input: ${text}\n\nStrictly return ONLY valid JSON matching the exact schema requested.`;

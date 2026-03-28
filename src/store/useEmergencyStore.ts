@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { EmergencyResponse } from '../schema/emergency';
+import { EmergencyResponse } from '../types/emergency';
 
 interface EmergencyState {
   inputText: string;

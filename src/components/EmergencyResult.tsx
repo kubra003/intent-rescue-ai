@@ -44,9 +44,22 @@ export function EmergencyResult() {
       <div className="bg-white/90 backdrop-blur-2xl rounded-[3.5rem] shadow-2xl border border-slate-200 overflow-hidden">
         <div className="p-8 md:p-12 relative overflow-hidden bg-slate-900 text-white">
           <div className="z-10 relative flex flex-col md:flex-row justify-between items-start gap-8">
-            <div className="flex-1">
-              <RiskIndicator severity={result.conditionSeverity} label={result.riskLevel} />
-              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mt-8 drop-shadow-2xl">
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-6">
+                <RiskIndicator severity={result.conditionSeverity} label={result.riskLevel} />
+                <div className="text-right">
+                  <div className={`text-xl font-black uppercase tracking-widest ${
+                    result.confidence > 0.8 ? 'text-emerald-400' : 
+                    result.confidence > 0.5 ? 'text-amber-400' : 'text-red-400'
+                  }`}>
+                    AI Confidence: {Math.round(result.confidence * 100)}%
+                  </div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                    Latency: {result.latency || '??'}ms
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mt-4 drop-shadow-2xl">
                 {result.emergencyType}
               </h2>
             </div>

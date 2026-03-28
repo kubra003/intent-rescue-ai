@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getEmergencyHistory, EmergencyLog } from '../lib/services/firestore';
+import { getEmergencyHistory, EmergencyLog } from '../services/firestore';
 import { History, Clock, Activity, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
