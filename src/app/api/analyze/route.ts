@@ -29,9 +29,12 @@ export async function POST(req: Request) {
     let rawJsonResult;
     try {
       rawJsonResult = await analyzeEmergency(cleanText, imageBase64);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Gemini Failure:", e);
-      return NextResponse.json(FallbackEmergencyResponse);
+      return NextResponse.json({
+         ...FallbackEmergencyResponse,
+         summary: `Gemini API Crash: ${e.message || String(e)}`
+      });
     }
 
     // 2. Deterministic Verification Layer using Zod
@@ -43,7 +46,10 @@ export async function POST(req: Request) {
     } else {
       console.warn("Zod Validation Failed:", validationResult.error);
       // Hallucination Guardrail: Fall back to safe deterministic default
-      return NextResponse.json(FallbackEmergencyResponse);
+      return NextResponse.json({
+         ...FallbackEmergencyResponse,
+         summary: `Schema Validation Error. Model returned: ${JSON.stringify(rawJsonResult)}`
+      });
     }
     
   } catch (error) {
